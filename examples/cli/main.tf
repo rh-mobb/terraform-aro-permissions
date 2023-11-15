@@ -14,6 +14,8 @@ module "example" {
     create = false
   }
 
+  minimal_network_role = "dscott-test"
+
   subscription_id = data.azurerm_client_config.current.subscription_id
   tenant_id       = data.azurerm_client_config.current.tenant_id
 }
@@ -41,4 +43,8 @@ output "installer_service_principal_installer_secret" {
 
 output "resource_provider_service_principal_client_id" {
   value = module.example.resource_provider_service_principal_client_id
+}
+
+output "vnet" {
+  value = module.example.vnet
 }

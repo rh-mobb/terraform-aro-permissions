@@ -83,6 +83,26 @@ variable "vnet_resource_group" {
   description = "Resource Group where the VNET resides.  If unspecified, defaults to 'aro_resource_group.name'."
 }
 
+# TODO: pull from data sources
+variable "vnet_has_route_tables" {
+  type        = bool
+  default     = false
+  description = "Specify if the VNET has route tables attached."
+}
+
+# TODO: pull from data sources
+variable "vnet_has_nat_gateways" {
+  type        = bool
+  default     = false
+  description = "Specify if the VNET has NAT gateways attached."
+}
+
+variable "network_security_group" {
+  type        = string
+  default     = null
+  description = "Network security group used in a BYO-NSG scenario."
+}
+
 #
 # roles
 #
