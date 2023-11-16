@@ -96,13 +96,13 @@ variable "network_security_group" {
 variable "minimal_network_role" {
   type        = string
   default     = null
-  description = "Role to manage to substitute for full 'Network Contributor' on network objects.  If specified, this is created."
+  description = "Role to substitute for full 'Network Contributor' on network objects.  If specified, this is created."
 }
 
 variable "minimal_aro_role" {
   type        = string
   default     = null
-  description = "Role to manaae to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created."
+  description = "Role to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created."
 }
 
 #
