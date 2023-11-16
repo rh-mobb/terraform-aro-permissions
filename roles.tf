@@ -16,18 +16,18 @@ locals {
   ]
 
   # permissions needed by vnets with route tables
-  route_table_permissions = var.vnet_has_route_tables ? [] : [
+  route_table_permissions = var.vnet_has_route_tables ? [
     "Microsoft.Network/routeTables/join/action",
     "Microsoft.Network/routeTables/read",
     "Microsoft.Network/routeTables/write"
-  ]
+  ] : []
 
   # permissions needed by vnets with nat gateways
-  nat_gateway_permissions = var.vnet_has_nat_gateways ? [] : [
+  nat_gateway_permissions = var.vnet_has_nat_gateways ? [
     "Microsoft.Network/natGateways/join/action",
     "Microsoft.Network/natGateways/read",
     "Microsoft.Network/natGateways/write"
-  ]
+  ] : []
 }
 
 resource "azurerm_role_definition" "network" {
