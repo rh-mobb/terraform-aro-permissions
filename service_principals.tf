@@ -41,8 +41,9 @@ locals {
 #
 # installer service principal
 #
+
 locals {
-  installer_user_set               = (var.installer_user != "") && (var.installer_user != null)
+  installer_user_set               = (var.installer_user != "") || (var.installer_user != null)
   installer_service_principal_name = (var.installer_service_principal.name == "") || (var.installer_service_principal.name == null) ? "${var.cluster_name}-installer" : var.installer_service_principal.name
 }
 
