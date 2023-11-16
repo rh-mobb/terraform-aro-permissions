@@ -19,8 +19,8 @@ in verbiage when describing what permissions are needed.
 
 | Identity | Type | Install Flags | Description |
 | ---- | ---- | ---- | ---- |
-| Cluster Service Principal | Service Principal | `--client-id` and `--client-secret` | Runs all operations in the cluster and interacts with the Azure API as part of operations within the cluster. Cluster Autoscaler and the Service Controller for Azure are two key components which leverage these credentials. |
-| Installer | User or Service Principal | N/A | The account that is used to initiate cluster installation with `az aro create...` command or its equivalent.  This may be a user account or a service principal.  This is who is logged in using the `az login` command. |
+| Cluster Service Principal | Service Principal | `--client-id` and `--client-secret` | Runs all operations in the cluster and that interacts with the Azure API as part of operations within the cluster. Cluster Autoscaler and the Service Controller for Azure are two key components which leverage these credentials. |
+| Installer | User or Service Principal | N/A | Whomever the installation process is run as.  This may be a user account or a service principal.  This is who is logged in using the `az login` command. |
 | Resource Provider Service Principal | Service Principal | N/A | Azure Resource Provider that represents ARO.  This is automatically created in the account when first running the setup step `az provider register -n Microsoft.RedHatOpenShift --wait`.  This service principal can be found by running `az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'"`. |
 
 
@@ -36,7 +36,7 @@ This section defines the objects which need individual permissions.
 | Subscription | `--subscription` | The highest level a permission will be applied.  Inherits down to all objects within that subscription.  This is not a mandatory flag and the subscription may be set based on how a user has logged in with `az login`. |
 | ARO Resource Group | `--resource-group` | Resource group in the above subscription where the actual ARO object is created. |
 | Cluster Resource Group | `--cluster-resource-group` | Resource group in the above subscription where the underlying ARO object (e.g. VMs, load balancers) are created.  This is created automatically as part of provisioning. |
-| Network Resource Group | `--vnet-resource-group` | Resource group in the above subscription where network resources (e.g. VNET, NSG) exist.  Some organizations will use the Cluster Resource Group for this purpose as well and do not need a dedicated Network Resource Group. If a different resource group is used, the VNET and cluster resource groups must belong to the same subscription|
+| Network Resource Group | `--vnet-resource-group` | Resource group in the above subscription where network resources (e.g. VNET, NSG) exist.  Some organizations will use the Cluster Resource Group for this purpose as well and do not need a dedicated Network Resource Group. |
 | VNET | VNET | `--vnet` | VNET where the ARO cluster will be provisioned. |
 | Network Security Group | N/A | Only required for BYO-NSG scenarios.  Network security group, within the VNET.  This is is pre-applied by the user to the subnets within the `--vnet` prior to installation. |
 
@@ -95,7 +95,7 @@ Needed when provided VNET has NAT gateway(s) attached:
 
 ### Minimal ARO Permissions
 
-In addition to minimizing network level permissions, the installer role may need minimal cluster level permissions as well.  These permissions are as follows:
+In addition to minimizing network permissions, the installer role may need minimal permissions as well.  These permissions are as follows:
 
 * Microsoft.RedHatOpenShift/openShiftClusters/read
 * Microsoft.RedHatOpenShift/openShiftClusters/write
