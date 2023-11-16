@@ -63,13 +63,13 @@ resource "azurerm_role_definition" "aro" {
 
   name        = "${var.cluster_name}-aro"
   description = "Custom role for ARO for cluster: ${var.cluster_name}"
-  scope       = data.azurerm_resource_group.aro.id
+  scope       = local.aro_resource_group.id
 
   permissions {
     actions = local.aro_permissions
   }
 
-  assignable_scopes = [data.azurerm_resource_group.aro.id]
+  assignable_scopes = [local.aro_resource_group.id]
 }
 
 #

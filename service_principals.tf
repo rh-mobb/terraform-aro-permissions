@@ -74,13 +74,6 @@ resource "azuread_service_principal" "installer" {
   owners         = [data.azuread_client_config.current.object_id]
 }
 
-locals {
-  installer_service_principal_object_id = local.installer_user_set ? null : (var.installer_service_principal.create ? azuread_service_principal.installer[0].object_id : data.azuread_service_principal.installer[0].object_id)
-}
-
-#
-# installer user
-#
 data "azuread_user" "installer" {
   count = local.installer_user_set ? 1 : 0
 
@@ -88,7 +81,9 @@ data "azuread_user" "installer" {
 }
 
 locals {
-  installer_user_object_id = local.installer_user_set ? data.azuread_user.installer[0].object_id : null
+  installer_service_principal_object_id = local.installer_user_set ? null : (var.installer_service_principal.create ? azuread_service_principal.installer[0].object_id : data.azuread_service_principal.installer[0].object_id)
+  installer_user_object_id              = local.installer_user_set ? data.azuread_user.installer[0].object_id : null
+  installer_object_id                   = local.installer_user_set ? local.installer_user_object_id : local.installer_service_principal_object_id
 }
 
 #

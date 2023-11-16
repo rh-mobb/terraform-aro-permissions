@@ -60,16 +60,7 @@ variable "aro_resource_group" {
     name   = string
     create = bool
   })
-  default = {
-    name   = null
-    create = true
-  }
   description = "ARO resource group to use or optionally create."
-
-  validation {
-    condition     = ((var.aro_resource_group.name != null) && (var.aro_resource_group.name != "") && (var.aro_resource_group.create == false)) || var.aro_resource_group.create
-    error_message = "'aro_resource_group.name' is a required value if 'aro_resource_group.create' is set to 'false'."
-  }
 }
 
 variable "vnet" {
