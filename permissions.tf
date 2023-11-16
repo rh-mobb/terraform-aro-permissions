@@ -19,12 +19,12 @@ data "azurerm_network_security_group" "vnet" {
 # cluster service principal permissions
 #
 
-# permission 1: assign cluster identity with contributor permissions on the aro resource group
-resource "azurerm_role_assignment" "cluster_aro_resource_group" {
-  scope                            = local.aro_resource_group.id
-  role_definition_name             = "Contributor"
-  principal_id                     = local.cluster_service_principal_object_id
-  skip_service_principal_aad_check = var.cluster_service_principal.create
+# permission 1: assign cluster identity with appropriate vnet permissions
+resource "azurerm_role_assignment" "cluster_vnet" {
+  scope                = data.azurerm_virtual_network.vnet.id
+  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
+  role_definition_name = local.custom_network_role ? null : "Network Contributor"
+  principal_id         = local.cluster_service_principal_object_id
 }
 
 # permission 2: assign cluster identity with appropriate network security group permissions
@@ -38,12 +38,12 @@ resource "azurerm_role_assignment" "cluster_network_security_group" {
   skip_service_principal_aad_check = var.cluster_service_principal.create
 }
 
-# permission 3: assign cluster identity with appropriate vnet permissions
-resource "azurerm_role_assignment" "cluster_vnet" {
-  scope                = data.azurerm_virtual_network.vnet.id
-  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
-  role_definition_name = local.custom_network_role ? null : "Network Contributor"
-  principal_id         = local.cluster_service_principal_object_id
+# permission 3: assign cluster identity with contributor permissions on the aro resource group
+resource "azurerm_role_assignment" "cluster_aro_resource_group" {
+  scope                            = local.aro_resource_group.id
+  role_definition_name             = "Contributor"
+  principal_id                     = local.cluster_service_principal_object_id
+  skip_service_principal_aad_check = var.cluster_service_principal.create
 }
 
 #
