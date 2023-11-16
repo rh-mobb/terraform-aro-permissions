@@ -16,7 +16,7 @@ locals {
   ]
 
   # permissions needed by vnets with route tables
-  route_table_permisisons = var.vnet_has_route_tables ? [] : [
+  route_table_permissions = var.vnet_has_route_tables ? [] : [
     "Microsoft.Network/routeTables/join/action",
     "Microsoft.Network/routeTables/read",
     "Microsoft.Network/routeTables/write"
@@ -38,7 +38,7 @@ resource "azurerm_role_definition" "network" {
   scope       = data.azurerm_virtual_network.vnet.id
 
   permissions {
-    actions = toset(flatten(concat(local.network_permissions, local.route_table_permisisons, local.nat_gateway_permissions)))
+    actions = toset(flatten(concat(local.network_permissions, local.route_table_permissions, local.nat_gateway_permissions)))
   }
 
   assignable_scopes = [data.azurerm_virtual_network.vnet.id]
