@@ -46,10 +46,10 @@ variable "installer_service_principal" {
   description = "Installer Service Principal to use or optionally create.  If name is unset, the cluster_name is used to derive a name.  Overridden if an 'installer_user_name' is specified."
 }
 
-variable "installer_user_name" {
+variable "installer_user" {
   type        = string
   default     = ""
-  description = "User who will be executing the installation (e.g. via az aro create).  This overrides the 'installer_service_principal'."
+  description = "User who will be executing the installation (e.g. via az aro create).  This overrides the 'installer_service_principal'.  Must be in UPN format (e.g. jdoe@example.com)."
 }
 
 #
@@ -60,16 +60,7 @@ variable "aro_resource_group" {
     name   = string
     create = bool
   })
-  default = {
-    name   = null
-    create = true
-  }
   description = "ARO resource group to use or optionally create."
-
-  validation {
-    condition     = ((var.aro_resource_group.name != null) && (var.aro_resource_group.name != "") && (var.aro_resource_group.create == false)) || var.aro_resource_group.create
-    error_message = "'aro_resource_group.name' is a required value if 'aro_resource_group.create' is set to 'false'."
-  }
 }
 
 variable "vnet" {
