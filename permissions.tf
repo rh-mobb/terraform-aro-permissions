@@ -59,16 +59,6 @@ resource "azurerm_role_assignment" "installer_aro_resource_group" {
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
 
-# # permission 4: assign installer user with appropriate aro resource group permissions
-# resource "azurerm_role_assignment" "installer_user_aro_resource_group" {
-#   count = local.installer_user_set ? 1 : 0
-
-#   scope                = local.aro_resource_group.id
-#   role_definition_id   = local.custom_aro_role ? azurerm_role_definition.aro[0].role_definition_resource_id : null
-#   role_definition_name = local.custom_aro_role ? null : "Contributor"
-#   principal_id         = local.installer_user_object_id
-# }
-
 # permission 5: assign installer service principal reader to the network resource group if using a cli installation
 resource "azurerm_role_assignment" "installer_network_resource_group" {
   count = var.installation_type == "cli" ? 1 : 0
@@ -78,15 +68,6 @@ resource "azurerm_role_assignment" "installer_network_resource_group" {
   principal_id                     = local.installer_object_id
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
-
-# # permission 5: assign installer user reader to the network resource group if using a cli installation
-# resource "azurerm_role_assignment" "installer_user_network_resource_group" {
-#   count = (local.installer_user_set && var.installation_type == "cli") ? 1 : 0
-
-#   scope                = data.azurerm_resource_group.network.id
-#   role_definition_name = "Reader"
-#   principal_id         = local.installer_user_object_id
-# }
 
 # permission 6: assign installer service principal user access admin to the subscription if using a cli installation
 resource "azurerm_role_assignment" "installer_subscription" {
@@ -98,15 +79,6 @@ resource "azurerm_role_assignment" "installer_subscription" {
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
 
-# # permission 6: assign installer user user access admin to the subscription if using a cli installation
-# resource "azurerm_role_assignment" "installer_user_subscription" {
-#   count = (local.installer_user_set && var.installation_type == "cli") ? 1 : 0
-
-#   scope                = data.azurerm_subscription.current.id
-#   role_definition_name = "User Access Administrator"
-#   principal_id         = local.installer_user_object_id
-# }
-
 # permission 7: assign installer service principal directory reader in azure ad if using a cli installation
 resource "azuread_directory_role_assignment" "installer_directory" {
   count = var.installation_type == "cli" ? 1 : 0
@@ -114,14 +86,6 @@ resource "azuread_directory_role_assignment" "installer_directory" {
   role_id             = data.external.directory_reader_role.result.id
   principal_object_id = local.installer_object_id
 }
-
-# # permission 7: assign installer user directory reader in azure ad if using a cli installation
-# resource "azuread_directory_role_assignment" "installer_user_directory" {
-#   count = (local.installer_user_set && var.installation_type == "cli") ? 1 : 0
-
-#   role_id             = data.external.directory_reader_role.result.id
-#   principal_object_id = local.installer_user_object_id
-# }
 
 #
 # resource provider service principal permissions
