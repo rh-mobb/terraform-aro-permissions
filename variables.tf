@@ -46,10 +46,10 @@ variable "installer_service_principal" {
   description = "Installer Service Principal to use or optionally create.  If name is unset, the cluster_name is used to derive a name.  Overridden if an 'installer_user_name' is specified."
 }
 
-variable "installer_user_name" {
+variable "installer_user" {
   type        = string
   default     = ""
-  description = "User who will be executing the installation (e.g. via az aro create).  This overrides the 'installer_service_principal'."
+  description = "User who will be executing the installation (e.g. via az aro create).  This overrides the 'installer_service_principal'.  Must be in UPN format (e.g. jdoe@example.com)."
 }
 
 #

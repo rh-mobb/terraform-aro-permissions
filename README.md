@@ -103,6 +103,20 @@ In addition to minimizing network permissions, the installer role may need minim
 * Microsoft.RedHatOpenShift/openShiftClusters/listAdminCredentials/action
 
 
+## Prereqs
+
+Prior to running this module, the following must be satisfied:
+
+1. Must be logged in as an administrator user using the `az login` command.  Because assigning permissions is an administrative task, 
+it is assumed whomever is running this module is an administrator.
+
+2. Must have the `az` CLI installed and configured locally.  There are some external commands ran in this module which makes this 
+necessary.  It is not ideal but it works for now.
+
+3. Must have the `jq` CLI installed locally.  There are some external commands ran in this module which makes this 
+necessary.  It is not ideal but it works for now.
+
+
 ## Usage
 
 This section describes how to consume this module.

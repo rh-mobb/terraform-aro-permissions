@@ -7,3 +7,4 @@
 .tfstate.backup
 main.plan
 .terraform.tfstate.lock.info
+*.txt
