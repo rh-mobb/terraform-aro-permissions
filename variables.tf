@@ -20,28 +20,24 @@ variable "installation_type" {
 #
 variable "cluster_service_principal" {
   type = object({
-    name          = string
-    create        = bool
-    output_secret = bool
+    name   = string
+    create = bool
   })
   default = {
-    name          = null
-    create        = true
-    output_secret = true
+    name   = null
+    create = true
   }
   description = "Cluster Service Principal to use or optionally create.  If name is unset, the cluster_name is used to derive a name."
 }
 
 variable "installer_service_principal" {
   type = object({
-    name          = string
-    create        = bool
-    output_secret = bool
+    name   = string
+    create = bool
   })
   default = {
-    name          = null
-    create        = true
-    output_secret = true
+    name   = null
+    create = true
   }
   description = "Installer Service Principal to use or optionally create.  If name is unset, the cluster_name is used to derive a name.  Overridden if an 'installer_user_name' is specified."
 }
