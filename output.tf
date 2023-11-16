@@ -18,7 +18,7 @@ resource "local_sensitive_file" "installer_service_principal" {
   content         = <<-EOT
 ARO_INSTALLER_SP_CLIENT_ID='${azuread_application.installer[0].client_id}'
 ARO_INSTALLER_SP_CLIENT_SECRET='${azuread_application_password.installer[0].value}'
-ARO_TENANT_ID='${azuread_client_config.current.tenant_id}'
+ARO_TENANT_ID='${data.azuread_client_config.current.tenant_id}'
 EOT
   filename        = "./${var.cluster_name}_installer-sp-credentials.txt"
   file_permission = "0600"

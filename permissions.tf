@@ -43,7 +43,7 @@ resource "azurerm_role_assignment" "cluster_vnet" {
   scope                = data.azurerm_virtual_network.vnet.id
   role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
   role_definition_name = local.custom_network_role ? null : "Network Contributor"
-  principal_id         = data.azuread_service_principal.cluster.object_id
+  principal_id         = local.cluster_service_principal_object_id
 }
 
 #
