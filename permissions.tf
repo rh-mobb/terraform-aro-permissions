@@ -19,7 +19,7 @@ data "azurerm_network_security_group" "vnet" {
 # cluster service principal permissions
 #
 
-# permission 1: assign cluster service principal with contributor permissions on the aro resource group
+# permission 1: assign cluster identity with contributor permissions on the aro resource group
 resource "azurerm_role_assignment" "cluster_aro_resource_group" {
   scope                            = local.aro_resource_group.id
   role_definition_name             = "Contributor"
@@ -27,7 +27,7 @@ resource "azurerm_role_assignment" "cluster_aro_resource_group" {
   skip_service_principal_aad_check = var.cluster_service_principal.create
 }
 
-# permission 2: assign cluster service principal with appropriate network security group permissions
+# permission 2: assign cluster identity with appropriate network security group permissions
 resource "azurerm_role_assignment" "cluster_network_security_group" {
   count = (var.network_security_group == null || var.network_security_group == "") ? 0 : 1
 
@@ -38,7 +38,7 @@ resource "azurerm_role_assignment" "cluster_network_security_group" {
   skip_service_principal_aad_check = var.cluster_service_principal.create
 }
 
-# permission 3: assign cluster service principal with appropriate vnet permissions
+# permission 3: assign cluster identity with appropriate vnet permissions
 resource "azurerm_role_assignment" "cluster_vnet" {
   scope                = data.azurerm_virtual_network.vnet.id
   role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
@@ -50,7 +50,7 @@ resource "azurerm_role_assignment" "cluster_vnet" {
 # installer service principal permissions
 #
 
-# permission 4: assign installer service principal with appropriate aro resource group permissions
+# permission 4: assign installer identity with appropriate aro resource group permissions
 resource "azurerm_role_assignment" "installer_aro_resource_group" {
   scope                            = local.aro_resource_group.id
   role_definition_id               = local.custom_aro_role ? azurerm_role_definition.aro[0].role_definition_resource_id : null
@@ -59,7 +59,7 @@ resource "azurerm_role_assignment" "installer_aro_resource_group" {
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
 
-# permission 5: assign installer service principal reader to the network resource group if using a cli installation
+# permission 5: assign installer identity reader to the network resource group if using a cli installation
 resource "azurerm_role_assignment" "installer_network_resource_group" {
   count = var.installation_type == "cli" ? 1 : 0
 
@@ -69,7 +69,7 @@ resource "azurerm_role_assignment" "installer_network_resource_group" {
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
 
-# permission 6: assign installer service principal user access admin to the subscription if using a cli installation
+# permission 6: assign installer identity user access admin to the subscription if using a cli installation
 resource "azurerm_role_assignment" "installer_subscription" {
   count = var.installation_type == "cli" ? 1 : 0
 
@@ -79,12 +79,22 @@ resource "azurerm_role_assignment" "installer_subscription" {
   skip_service_principal_aad_check = var.installer_service_principal.create
 }
 
-# permission 7: assign installer service principal directory reader in azure ad if using a cli installation
+# permission 7: assign installer identity directory reader in azure ad if using a cli installation
 resource "azuread_directory_role_assignment" "installer_directory" {
   count = var.installation_type == "cli" ? 1 : 0
 
   role_id             = data.external.directory_reader_role.result.id
   principal_object_id = local.installer_object_id
+}
+
+# permission 8: assign installer identity with appropriate vnet permissions
+resource "azurerm_role_assignment" "cluster_vnet" {
+  count = var.installation_type == "cli" ? 1 : 0
+
+  scope                = data.azurerm_virtual_network.vnet.id
+  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
+  role_definition_name = local.custom_network_role ? null : "Network Contributor"
+  principal_id         = local.installer_object_id
 }
 
 #
