@@ -16,32 +16,9 @@ data "azurerm_network_security_group" "vnet" {
 }
 
 #
-# resource provider service principal permissions
-#
-
-# permission 8: assign resource provider service principal with appropriate vnet permissions
-resource "azurerm_role_assignment" "resource_provider_vnet" {
-  scope                = data.azurerm_virtual_network.vnet.id
-  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
-  role_definition_name = local.custom_network_role ? null : "Network Contributor"
-  principal_id         = data.azuread_service_principal.aro_resource_provider.object_id
-}
-
-# permission 9: assign resource provider service principal with appropriate network security group permissions
-resource "azurerm_role_assignment" "resource_provider_network_security_group" {
-  count = (var.network_security_group == null || var.network_security_group == "") ? 0 : 1
-
-  scope                = data.azurerm_network_security_group.vnet[0].id
-  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
-  role_definition_name = local.custom_network_role ? null : "Network Contributor"
-  principal_id         = data.azuread_service_principal.aro_resource_provider.object_id
-}
-
-#
 # cluster service principal permissions
 #
 
-# TODO: Principals of type Application cannot validly be used in role assignments error
 # permission 1: assign cluster service principal with contributor permissions on the aro resource group
 resource "azurerm_role_assignment" "cluster_aro_resource_group" {
   scope                            = data.azurerm_resource_group.aro.id
@@ -138,4 +115,26 @@ resource "azuread_directory_role_assignment" "installer_user_directory" {
 
   role_id             = data.external.directory_reader_role.result.id
   principal_object_id = local.installer_user_object_id
+}
+
+#
+# resource provider service principal permissions
+#
+
+# permission 8: assign resource provider service principal with appropriate vnet permissions
+resource "azurerm_role_assignment" "resource_provider_vnet" {
+  scope                = data.azurerm_virtual_network.vnet.id
+  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
+  role_definition_name = local.custom_network_role ? null : "Network Contributor"
+  principal_id         = data.azuread_service_principal.aro_resource_provider.object_id
+}
+
+# permission 9: assign resource provider service principal with appropriate network security group permissions
+resource "azurerm_role_assignment" "resource_provider_network_security_group" {
+  count = (var.network_security_group == null || var.network_security_group == "") ? 0 : 1
+
+  scope                = data.azurerm_network_security_group.vnet[0].id
+  role_definition_id   = local.custom_network_role ? azurerm_role_definition.network[0].role_definition_resource_id : null
+  role_definition_name = local.custom_network_role ? null : "Network Contributor"
+  principal_id         = data.azuread_service_principal.aro_resource_provider.object_id
 }
