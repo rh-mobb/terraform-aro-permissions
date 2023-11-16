@@ -88,7 +88,7 @@ resource "azuread_directory_role_assignment" "installer_directory" {
 }
 
 # permission 8: assign installer identity with appropriate vnet permissions
-resource "azurerm_role_assignment" "cluster_vnet" {
+resource "azurerm_role_assignment" "installer_vnet" {
   count = var.installation_type == "cli" ? 1 : 0
 
   scope                = data.azurerm_virtual_network.vnet.id

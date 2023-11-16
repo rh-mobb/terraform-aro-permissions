@@ -53,6 +53,7 @@ locals {
   aro_permissions = [
     "Microsoft.RedHatOpenShift/openShiftClusters/read",
     "Microsoft.RedHatOpenShift/openShiftClusters/write",
+    "Microsoft.RedHatOpenShift/openShiftClusters/delete",
     "Microsoft.RedHatOpenShift/openShiftClusters/listCredentials/action",
     "Microsoft.RedHatOpenShift/openShiftClusters/listAdminCredentials/action"
   ]
