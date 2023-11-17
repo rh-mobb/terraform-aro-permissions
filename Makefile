@@ -37,6 +37,21 @@ setup-test:
 		--vnet-name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
 		--disable-private-link-service-network-policies true
 
+	NSG=$$(az network nsg create --resource-group $(ARO_VNET_RESOURCE_GROUP) --name $(ARO_CLUSTER_NAME)-nsg -o tsv --query NewNSG.id)
+
+# NOTE: add this to the above make target when pre-configured NSG is available in the TF provider.  until then we can skip testing.
+# az network vnet subnet update \
+# 	--name "$(ARO_CLUSTER_NAME)-aro-control-subnet-$(AZR_LOCATION)" \
+# 	--resource-group $(ARO_VNET_RESOURCE_GROUP) \
+# 	--vnet-name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
+# 	--nsg $${NSG}
+
+# az network vnet subnet update \
+# 	--name "$(ARO_CLUSTER_NAME)-aro-worker-subnet-$(AZR_LOCATION)" \
+# 	--resource-group $(ARO_VNET_RESOURCE_GROUP) \
+# 	--vnet-name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
+# 	--nsg $${NSG}
+
 setup-cluster:
 	az aro create \
 		--resource-group $AZR_RESOURCE_GROUP \
@@ -50,21 +65,4 @@ setup-cluster:
 # teardown tasks when done testing
 #
 teardown-test:
-	az network subnet delete \
-		--name "$(ARO_CLUSTER_NAME)-aro-worker-subnet-$(AZR_LOCATION)" \
-		--resource-group $(ARO_VNET_RESOURCE_GROUP) \
-		--vnet-name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
-		--yes
-
-	az network subnet delete \
-		--name "$(ARO_CLUSTER_NAME)-aro-control-subnet-$(AZR_LOCATION)" \
-		--resource-group $(ARO_VNET_RESOURCE_GROUP) \
-		--vnet-name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
-		--yes
-
-	az network vnet delete \
-		--name "$(ARO_CLUSTER_NAME)-aro-vnet-$(AZR_LOCATION)" \
-		--resource-group $(ARO_VNET_RESOURCE_GROUP) \
-		--yes
-
 	az group delete --name $(ARO_VNET_RESOURCE_GROUP) --yes

@@ -28,6 +28,10 @@ locals {
     "Microsoft.Network/natGateways/read",
     "Microsoft.Network/natGateways/write"
   ] : []
+
+  # scopes
+  network_role_base_scope        = data.azurerm_virtual_network.vnet.id
+  network_role_assignable_scopes = (var.network_security_group == null || var.network_security_group == "") ? [local.network_role_base_scope] : [local.network_role_base_scope, data.azurerm_network_security_group.vnet[0].id]
 }
 
 resource "azurerm_role_definition" "network" {
@@ -35,13 +39,13 @@ resource "azurerm_role_definition" "network" {
 
   name        = "${var.cluster_name}-network"
   description = "Custom role for ARO network for cluster: ${var.cluster_name}"
-  scope       = data.azurerm_virtual_network.vnet.id
+  scope       = local.network_role_base_scope
 
   permissions {
     actions = toset(flatten(concat(local.network_permissions, local.route_table_permissions, local.nat_gateway_permissions)))
   }
 
-  assignable_scopes = [data.azurerm_virtual_network.vnet.id]
+  assignable_scopes = local.network_role_assignable_scopes
 }
 
 #
