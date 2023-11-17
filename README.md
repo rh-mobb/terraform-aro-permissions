@@ -101,6 +101,7 @@ In addition to minimizing network permissions, the installer role may need minim
 
 * Microsoft.RedHatOpenShift/openShiftClusters/read
 * Microsoft.RedHatOpenShift/openShiftClusters/write
+* Microsoft.RedHatOpenShift/openShiftClusters/delete
 * Microsoft.RedHatOpenShift/openShiftClusters/listCredentials/action
 * Microsoft.RedHatOpenShift/openShiftClusters/listAdminCredentials/action
 
