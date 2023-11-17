@@ -81,14 +81,14 @@ Needed always:
 * [Microsoft.Network/virtualNetworks/subnets/write](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L221-L226)
 * [Microsoft.Network/networkSecurityGroups/join/action](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L846)
 
-Needed when provided VNET has route table(s) attached:
+Needed when provided VNET subnets have route table(s) attached:
 
 * [Microsoft.Network/routeTables/join/action](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L301-L303)
 * [Microsoft.Network/routeTables/read](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L301-L303)
 * [Microsoft.Network/routeTables/write](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L301-L303)
 
 
-Needed when provided VNET has NAT gateway(s) attached:
+Needed when provided VNET subnets have NAT gateway(s) attached:
 
 * [Microsoft.Network/natGateways/join/action](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L367-L369)
 * [Microsoft.Network/natGateways/read](https://github.com/Azure/ARO-RP/blob/v20231110.00/pkg/validate/dynamic/dynamic.go#L367-L369)
