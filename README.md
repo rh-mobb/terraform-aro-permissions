@@ -121,6 +121,9 @@ necessary.  It is not ideal but it works for now.
 4. Must have a VNET architecture pre-deployed and used as an input.
 
 
-## Usage
+## Examples
 
-This section describes how to consume this module.
+Examples of how to use this module are located in the examples directory.  The examples thus far are:
+
+1. When ARO will be installed with the Azure `az` CLI - [examples/cli](https://github.com/rh-mobb/terraform-aro-permissions/blob/main/examples/cli/main.tf)
+2. When ARO will be installed with an automation tool like Terraform (using the Microsoft API) - [examples/api](https://github.com/rh-mobb/terraform-aro-permissions/tree/main/examples/api)
