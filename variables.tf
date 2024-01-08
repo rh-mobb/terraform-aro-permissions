@@ -130,3 +130,9 @@ variable "tenant_id" {
   default     = null
   description = "Explicitly use a specific Azure tenant id (defaults to the current system configuration)."
 }
+
+variable "directory_reader_role_id" {
+  type = string
+  default = "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
+  description = "Directory Readers role ID"  
+}
