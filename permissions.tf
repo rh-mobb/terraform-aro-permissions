@@ -83,7 +83,7 @@ resource "azurerm_role_assignment" "installer_subscription" {
 resource "azuread_directory_role_assignment" "installer_directory" {
   count = var.installation_type == "cli" ? 1 : 0
 
-  role_id             = data.external.directory_reader_role.result.id
+  role_id             = var.directory_reader_role_id
   principal_object_id = local.installer_object_id
 }
 
