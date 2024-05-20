@@ -24,13 +24,13 @@ resource "azuread_application_password" "cluster" {
   count = var.cluster_service_principal.create ? 1 : 0
 
   display_name          = local.cluster_service_principal_name
-  application_object_id = azuread_application.cluster[0].object_id
+  application_id = azuread_application.cluster[0].id
 }
 
 resource "azuread_service_principal" "cluster" {
   count = var.cluster_service_principal.create ? 1 : 0
 
-  application_id = azuread_application.cluster[0].application_id
+  client_id = azuread_application.cluster[0].client_id
   owners         = [data.azuread_client_config.current.object_id]
 }
 
@@ -64,13 +64,13 @@ resource "azuread_application_password" "installer" {
   count = local.installer_user_set ? 0 : ((var.installer_service_principal.create) ? 1 : 0)
 
   display_name          = local.installer_service_principal_name
-  application_object_id = azuread_application.installer[0].object_id
+  application_id = azuread_application.installer[0].id
 }
 
 resource "azuread_service_principal" "installer" {
   count = local.installer_user_set ? 0 : ((var.installer_service_principal.create) ? 1 : 0)
 
-  application_id = azuread_application.installer[0].application_id
+  client_id = azuread_application.installer[0].client_id
   owners         = [data.azuread_client_config.current.object_id]
 }
 
