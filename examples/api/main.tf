@@ -10,10 +10,10 @@ module "example" {
   installation_type = "api"
 
   # cluster parameters
-  cluster_name           = "dscott-api"
-  vnet                   = "dscott-api-aro-vnet-eastus"
-  vnet_resource_group    = "dscott-api-vnet-rg"
-  network_security_group = "dscott-api-nsg"
+  cluster_name        = "dscott-api"
+  vnet                = "dscott-api-aro-vnet-eastus"
+  vnet_resource_group = "dscott-api-vnet-rg"
+  #network_security_group = "dscott-api-nsg"
   aro_resource_group = {
     name   = "dscott-api-rg"
     create = true

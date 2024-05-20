@@ -76,27 +76,3 @@ resource "azurerm_role_definition" "aro" {
 
   assignable_scopes = [local.aro_resource_group.id]
 }
-
-#
-# directory reader role
-#   NOTE: we do this only because using the azapi provider it is not obvious how to accomplish this and TF does not have a direct role
-#         for azure ad roles
-#   TODO: fix this
-#
-
-## The role ID for this role definition will always be 88d8e3e3-8f55-4a1e-953a-9b9898b8876b
-## https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference?toc=%2Fgraph%2Ftoc.json#directory-readers
-## This can be added as a variable and referenced.
-# locals {
-#   directory_reader_role_command = <<-EOT
-# ID=$(az rest --method GET --url https://graph.microsoft.com/v1.0/roleManagement/directory/roleDefinitions | jq -r '.value[] | select(.displayName == "Directory Readers") | .templateId') && echo "{\"id\":\"$ID\"}"
-# EOT
-# }
-
-# data "external" "directory_reader_role" {
-#   program = [
-#     "sh",
-#     "-c",
-#     local.directory_reader_role_command
-#   ]
-# }

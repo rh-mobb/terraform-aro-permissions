@@ -46,7 +46,7 @@ resource "azureopenshift_redhatopenshift_cluster" "cluster" {
   }
 
   worker_profile {
-    subnet_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/dscott-api-vnet-rg/providers/Microsoft.Network/virtualNetworks/dscott-api-aro-vnet-eastus/subnets/dscott-api-aro-worker-subnet-eastus"
+    subnet_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/dscott-api-vnet-rg/providers/Microsoft.Network/virtualNetworks/dscott-api-aro-vnet-eastus/subnets/dscott-api-aro-machine-subnet-eastus"
   }
 
   service_principal {
