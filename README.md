@@ -5,7 +5,7 @@ and manage ARO.  The problem we see in the field, is that there are overlapping 
 permission sets and this often times results in incorrect permissions and makes for a confusing experience.
 
 > **WARN:** It should be noted that certain product changes will force this to change.  This is a community-supported 
-product and you should consult your appropriate product documentation prior to using this in your environment 
+project and you should consult your appropriate product documentation prior to using this in your environment 
 to ensure it is appropriate for your needs.
 
 
