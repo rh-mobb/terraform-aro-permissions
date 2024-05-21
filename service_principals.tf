@@ -52,7 +52,7 @@ locals {
 data "azuread_service_principal" "installer" {
   count = local.installer_user_set ? 0 : ((var.installer_service_principal.create) ? 0 : 1)
 
-  display_name = local.cluster_service_principal_name
+  display_name = local.installer_service_principal_name
 }
 
 resource "azuread_application" "installer" {
