@@ -24,13 +24,6 @@ EOT
   file_permission = "0600"
 }
 
-locals {
-  cluster_service_principal_client_id       = var.cluster_service_principal.create ? azuread_application.cluster[0].client_id : null
-  cluster_service_principal_client_secret   = var.cluster_service_principal.create ? azuread_application_password.cluster[0].value : null
-  installer_service_principal_client_id     = var.installer_service_principal.create ? azuread_application.installer[0].client_id : null
-  installer_service_principal_client_secret = var.installer_service_principal.create ? azuread_application_password.installer[0].value : null
-}
-
 output "cluster_service_principal_client_id" {
   value = local.cluster_service_principal_client_id
 }

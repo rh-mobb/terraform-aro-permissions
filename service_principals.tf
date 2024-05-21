@@ -23,7 +23,7 @@ resource "azuread_application" "cluster" {
 resource "azuread_application_password" "cluster" {
   count = var.cluster_service_principal.create ? 1 : 0
 
-  display_name          = local.cluster_service_principal_name
+  display_name   = local.cluster_service_principal_name
   application_id = azuread_application.cluster[0].id
 }
 
@@ -31,11 +31,13 @@ resource "azuread_service_principal" "cluster" {
   count = var.cluster_service_principal.create ? 1 : 0
 
   client_id = azuread_application.cluster[0].client_id
-  owners         = [data.azuread_client_config.current.object_id]
+  owners    = [data.azuread_client_config.current.object_id]
 }
 
 locals {
-  cluster_service_principal_object_id = var.cluster_service_principal.create ? azuread_service_principal.cluster[0].object_id : data.azuread_service_principal.cluster[0].object_id
+  cluster_service_principal_object_id     = var.cluster_service_principal.create ? azuread_service_principal.cluster[0].object_id : data.azuread_service_principal.cluster[0].object_id
+  cluster_service_principal_client_id     = var.cluster_service_principal.create ? azuread_application.cluster[0].client_id : null
+  cluster_service_principal_client_secret = var.cluster_service_principal.create ? azuread_application_password.cluster[0].value : null
 }
 
 #
@@ -63,7 +65,7 @@ resource "azuread_application" "installer" {
 resource "azuread_application_password" "installer" {
   count = local.installer_user_set ? 0 : ((var.installer_service_principal.create) ? 1 : 0)
 
-  display_name          = local.installer_service_principal_name
+  display_name   = local.installer_service_principal_name
   application_id = azuread_application.installer[0].id
 }
 
@@ -71,7 +73,7 @@ resource "azuread_service_principal" "installer" {
   count = local.installer_user_set ? 0 : ((var.installer_service_principal.create) ? 1 : 0)
 
   client_id = azuread_application.installer[0].client_id
-  owners         = [data.azuread_client_config.current.object_id]
+  owners    = [data.azuread_client_config.current.object_id]
 }
 
 data "azuread_user" "installer" {
@@ -81,9 +83,11 @@ data "azuread_user" "installer" {
 }
 
 locals {
-  installer_service_principal_object_id = local.installer_user_set ? null : (var.installer_service_principal.create ? azuread_service_principal.installer[0].object_id : data.azuread_service_principal.installer[0].object_id)
-  installer_user_object_id              = local.installer_user_set ? data.azuread_user.installer[0].object_id : null
-  installer_object_id                   = local.installer_user_set ? local.installer_user_object_id : local.installer_service_principal_object_id
+  installer_service_principal_object_id     = local.installer_user_set ? null : (var.installer_service_principal.create ? azuread_service_principal.installer[0].object_id : data.azuread_service_principal.installer[0].object_id)
+  installer_user_object_id                  = local.installer_user_set ? data.azuread_user.installer[0].object_id : null
+  installer_object_id                       = local.installer_user_set ? local.installer_user_object_id : local.installer_service_principal_object_id
+  installer_service_principal_client_id     = var.installer_service_principal.create ? azuread_application.installer[0].client_id : null
+  installer_service_principal_client_secret = var.installer_service_principal.create ? azuread_application_password.installer[0].value : null
 }
 
 #
