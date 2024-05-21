@@ -12,12 +12,22 @@ terraform {
   }
 }
 
+#
+# provider configuration
+#
 data "azuread_client_config" "current" {}
+
+data "azurerm_client_config" "current" {}
+
+locals {
+  subscription_id = var.subscription_id == null || var.subscription_id == "" ? data.azurerm_client_config.current.subscription_id : var.subscription_id
+  tenant_id       = var.tenant_id == null || var.tenant_id == "" ? data.azurerm_client_config.current.tenant_id : var.tenant_id
+}
 
 provider "azurerm" {
   environment     = var.environment
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
+  subscription_id = local.subscription_id
+  tenant_id       = local.tenant_id
 
   features {
     resource_group {
