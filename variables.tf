@@ -71,17 +71,17 @@ variable "vnet_resource_group" {
 }
 
 # TODO: pull from data sources
-variable "vnet_has_route_tables" {
-  type        = bool
-  default     = false
-  description = "Specify if the VNET has route tables attached."
+variable "route_tables" {
+  type        = list(string)
+  default     = []
+  description = "Names of route tables for user-defined routing.  Route tables are assumed to exist in 'vnet_resource_group'."
 }
 
 # TODO: pull from data sources
-variable "vnet_has_nat_gateways" {
-  type        = bool
-  default     = false
-  description = "Specify if the VNET has NAT gateways attached."
+variable "nat_gateways" {
+  type        = list(string)
+  default     = []
+  description = "Names of NAT gateways for user-defined routing.  NAT gateways are assumed to exist in 'vnet_resource_group'."
 }
 
 variable "network_security_group" {
@@ -90,19 +90,25 @@ variable "network_security_group" {
   description = "Network security group used in a BYO-NSG scenario."
 }
 
+variable "disk_encryption_set" {
+  type        = string
+  default     = null
+  description = "Disk encryption set to use.  If specified, a role is created for allowing read access to the specified disk encryption set.  Must exist in 'aro_resource_group.name'."
+}
+
 #
 # roles
 #
 variable "minimal_network_role" {
   type        = string
   default     = null
-  description = "Role to manage to substitute for full 'Network Contributor' on network objects.  If specified, this is created."
+  description = "Role to manage to substitute for full 'Network Contributor' on network objects.  If specified, this is created, otherwise 'Network Contributor' is used.  For objects such as NSGs, route tables, and NAT gateways, this is used as a prefix for the role."
 }
 
 variable "minimal_aro_role" {
   type        = string
   default     = null
-  description = "Role to manaae to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created."
+  description = "Role to manage to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created, otherwise 'Contributor' is used.  For objects such as disk encryption sets, this is used as a prefix for the role."
 }
 
 #
@@ -131,8 +137,17 @@ variable "tenant_id" {
   description = "Explicitly use a specific Azure tenant id (defaults to the current system configuration)."
 }
 
-variable "directory_reader_role_id" {
-  type = string
-  default = "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
-  description = "Directory Readers role ID"  
+variable "location" {
+  type        = string
+  default     = "eastus"
+  description = "Azure region where region-specific objects exist or are to be created."
+}
+
+#
+# output
+#
+variable "output_as_file" {
+  type        = bool
+  default     = true
+  description = "Output created service principal client identifier and client secret into a source file."
 }

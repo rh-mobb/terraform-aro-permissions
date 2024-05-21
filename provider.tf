@@ -12,12 +12,21 @@ terraform {
   }
 }
 
+#
+# provider configuration
+#
 data "azuread_client_config" "current" {}
+
+data "azurerm_client_config" "current" {}
+
+locals {
+  subscription_id = var.subscription_id == null || var.subscription_id == "" ? data.azurerm_client_config.current.subscription_id : var.subscription_id
+}
 
 provider "azurerm" {
   environment     = var.environment
-  subscription_id = var.subscription_id
-  tenant_id       = var.tenant_id
+  subscription_id = var.subscription_id # we cannot use a local here due to import cycle; a null value uses the client config
+  tenant_id       = var.tenant_id       # we cannot use a local here due to import cycle; a null value uses the client config
 
   features {
     resource_group {
