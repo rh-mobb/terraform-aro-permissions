@@ -121,15 +121,17 @@ In addition to the above, the following other permissions may be needed by speci
 Prior to running this module, the following must be satisfied:
 
 1. Must be logged in as an administrator user using the `az login` command.  Because assigning permissions is an administrative task, 
-it is assumed whomever is running this module is an administrator.
+it is assumed whomever is running this module is an administrator.  Alternative to full tenant administrator permissions, a user that has the 
+[User Access Administrator](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#user-access-administrator) 
+role should be able to complete this task.
 
-2. Must have the `az` CLI installed and configured locally.  There are some external commands ran in this module which makes this 
+1. Must have the `az` CLI installed and configured locally.  There are some external commands ran in this module which makes this 
 necessary.  It is not ideal but it works for now.
 
-3. Must have the `jq` CLI installed locally.  There are some external commands ran in this module which makes this 
+1. Must have the `jq` CLI installed locally.  There are some external commands ran in this module which makes this 
 necessary.  It is not ideal but it works for now.
 
-4. Must have a VNET architecture pre-deployed and used as an input.
+1. Must have a VNET architecture pre-deployed and used as an input.
 
 
 ## Examples
