@@ -35,10 +35,11 @@ This section defines the objects which need individual permissions.
 | ---- | ---- | ---- |
 | Subscription | `--subscription` | The highest level a permission will be applied.  Inherits down to all objects within that subscription.  This is not a mandatory flag and the subscription may be set based on how a user has logged in with `az login`. |
 | ARO Resource Group | `--resource-group` | Resource group in the above subscription where the actual ARO object is created. |
-| Cluster Resource Group | `--cluster-resource-group` | Resource group in the above subscription where the underlying ARO object (e.g. VMs, load balancers) are created.  This is created automatically as part of provisioning. |
+| Cluster Resource Group | `--cluster-resource-group` | Resource group in the above subscription where the underlying ARO objects (e.g. VMs, load balancers) are created.  This is created automatically as part of provisioning. |
 | Network Resource Group | `--vnet-resource-group` | Resource group in the above subscription where network resources (e.g. VNET, NSG) exist.  Some organizations will use the Cluster Resource Group for this purpose as well and do not need a dedicated Network Resource Group. |
 | VNET | `--vnet`| VNET where the ARO cluster will be provisioned. |
 | Network Security Group | N/A | Only required for BYO-NSG scenarios.  Network security group, applied to the subnets.  This is is pre-applied by the user to the subnets prior to installation. |
+| Disk Encryption Set | `--disk-encryption-set` | The disk encryption set used to encrypt master and worker node disks. |
 
 
 ## Permissions
@@ -52,14 +53,16 @@ This section identifies what permissions are needed by each individual identity.
 | 1 | [Cluster Service Principal](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
 | 2 | [Cluster Service Principal](#identities) | [Network Security Group](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | Only needed if BYO-NSG is pre-attached to the subnet. |
 | 3 | [Cluster Service Principal](#identities) | [ARO Resource Group](#objects) | [Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor) | |
-| 4 | [Installer](#identities) | [ARO Resource Group](#objects) | [Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor) or [Minimal ARO Permissions](#minimal-aro-permissions) | |
-| 5 | [Installer](#identities) | [Network Resource Group](#objects)| [Reader](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader) | Only required if `az aro create` is used to install. |
-| 6 | [Installer](#identities) | [Subscription](#objects) | [User Access Administrator](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#user-access-administrator) | Only required if `az aro create` is used to install. |
-| 7 | [Installer](#identities) | Azure AD | [Directory Readers](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference#directory-readers) | Only required if `az aro create` is used to install. |
-| 8 | [Installer](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | Only required if `az aro create` is used to install. |
-| 9 | [Resource Provider Service Principal](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
-| 10 | [Resource Provider Service Principal](#identities) | [Network Security Group](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
-| 11 | [Resource Provider Service Principal](#identities) | [Cluster Resource Group](#objects) | [Owner](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#owner) | This permission does not need to pre-exist.  It is applied when the Resource Provider Service Principal creates the resource group as part of installation.  This is for documentation purposes only. |
+| 4 | [Cluster Service Principal](#identities) | [Disk Encryption Set](#objects) | [Other](#other-permissions) | |
+| 5 | [Installer](#identities) | [ARO Resource Group](#objects) | [Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor) or [Minimal ARO Permissions](#minimal-aro-permissions) | |
+| 6 | [Installer](#identities) | [Network Resource Group](#objects)| [Reader](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#reader) | Only required if `az aro create` is used to install. |
+| 7 | [Installer](#identities) | [Subscription](#objects) | [User Access Administrator](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#user-access-administrator) | Only required if `az aro create` is used to install. |
+| 8 | [Installer](#identities) | Azure AD | [Directory Readers](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference#directory-readers) | Only required if `az aro create` is used to install. |
+| 9 | [Installer](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | Only required if `az aro create` is used to install. |
+| 10 | [Resource Provider Service Principal](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
+| 11 | [Resource Provider Service Principal](#identities) | [Network Security Group](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
+| 12 | [Resource Provider Service Principal](#identities) | [Disk Encryption Set](#objects) | [Other](#other-permissions) | |
+| 13 | [Resource Provider Service Principal](#identities) | [Cluster Resource Group](#objects) | [Owner](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#owner) | This permission does not need to pre-exist.  It is applied when the Resource Provider Service Principal creates the resource group as part of installation.  This is for documentation purposes only. |
 
 
 ### Minimal Network Permissions
@@ -104,6 +107,13 @@ In addition to minimizing network permissions, the installer role may need minim
 * Microsoft.RedHatOpenShift/openShiftClusters/delete
 * Microsoft.RedHatOpenShift/openShiftClusters/listCredentials/action
 * Microsoft.RedHatOpenShift/openShiftClusters/listAdminCredentials/action
+
+
+### Other Permissions
+
+In addition to the above, the following other permissions may be needed by specific identities:
+
+* [Microsoft.Compute/diskEncryptionSets/read](https://github.com/Azure/ARO-RP/blob/v20240503.00/pkg/validate/dynamic/diskencryptionset.go#L78)
 
 
 ## Prereqs

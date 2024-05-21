@@ -90,6 +90,12 @@ variable "network_security_group" {
   description = "Network security group used in a BYO-NSG scenario."
 }
 
+variable "disk_encryption_set" {
+  type        = string
+  default     = null
+  description = "Disk encryption set to use.  If specified, a role is created for allowing read access to the specified disk encryption set.  Must exist in 'aro_resource_group.name'."
+}
+
 #
 # roles
 #
@@ -102,7 +108,7 @@ variable "minimal_network_role" {
 variable "minimal_aro_role" {
   type        = string
   default     = null
-  description = "Role to manaae to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created."
+  description = "Role to manage to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created."
 }
 
 #
@@ -131,8 +137,17 @@ variable "tenant_id" {
   description = "Explicitly use a specific Azure tenant id (defaults to the current system configuration)."
 }
 
-variable "directory_reader_role_id" {
-  type = string
-  default = "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
-  description = "Directory Readers role ID"  
+variable "location" {
+  type        = string
+  default     = "eastus"
+  description = "Azure region where region-specific objects exist or are to be created."
+}
+
+#
+# output
+#
+variable "output_as_file" {
+  type        = bool
+  default     = true
+  description = "Output created service principal client identifier and client secret into a source file."
 }

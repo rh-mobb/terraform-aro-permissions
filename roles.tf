@@ -30,14 +30,14 @@ locals {
   ] : []
 
   # scopes
-  network_role_base_scope        = data.azurerm_virtual_network.vnet.id
-  network_role_assignable_scopes = (var.network_security_group == null || var.network_security_group == "") ? [local.network_role_base_scope] : [local.network_role_base_scope, data.azurerm_network_security_group.vnet[0].id]
+  network_role_base_scope        = local.vnet_id
+  network_role_assignable_scopes = (var.network_security_group == null || var.network_security_group == "") ? [local.network_role_base_scope] : [local.network_role_base_scope, local.network_security_group_id]
 }
 
 resource "azurerm_role_definition" "network" {
   count = local.custom_network_role ? 1 : 0
 
-  name        = "${var.cluster_name}-network"
+  name        = var.minimal_network_role
   description = "Custom role for ARO network for cluster: ${var.cluster_name}"
   scope       = local.network_role_base_scope
 
@@ -66,13 +66,38 @@ locals {
 resource "azurerm_role_definition" "aro" {
   count = local.custom_aro_role ? 1 : 0
 
-  name        = "${var.cluster_name}-aro"
+  name        = var.minimal_aro_role
   description = "Custom role for ARO for cluster: ${var.cluster_name}"
-  scope       = local.aro_resource_group.id
+  scope       = local.aro_resource_group_id
 
   permissions {
     actions = local.aro_permissions
   }
 
-  assignable_scopes = [local.aro_resource_group.id]
+  assignable_scopes = [local.aro_resource_group_id]
+}
+
+#
+# minimal disk encryption set role
+#
+locals {
+  custom_des_role = (var.disk_encryption_set != null && var.disk_encryption_set != "")
+
+  des_permissions = [
+    "Microsoft.Compute/diskEncryptionSets/read"
+  ]
+}
+
+resource "azurerm_role_definition" "des" {
+  count = local.custom_des_role ? 1 : 0
+
+  name        = "${var.cluster_name}-des"
+  description = "Custom role for disk encryption set for cluster: ${var.cluster_name}"
+  scope       = local.disk_encryption_set_id
+
+  permissions {
+    actions = local.des_permissions
+  }
+
+  assignable_scopes = [local.disk_encryption_set_id]
 }
