@@ -25,6 +25,7 @@ module "example" {
     name   = "dscott-api-custom-cluster"
     create = true
   }
+
   installer_service_principal = {
     name   = "dscott-api-custom-installer"
     create = true

@@ -24,6 +24,10 @@ EOT
   file_permission = "0600"
 }
 
+output "cluster_service_principal_app_id" {
+  value = local.cluster_service_principal_app_id
+}
+
 output "cluster_service_principal_client_id" {
   value = local.cluster_service_principal_client_id
 }
@@ -31,6 +35,10 @@ output "cluster_service_principal_client_id" {
 output "cluster_service_principal_client_secret" {
   value     = local.cluster_service_principal_client_secret
   sensitive = true
+}
+
+output "installer_service_principal_app_id" {
+  value = local.installer_service_principal_app_id
 }
 
 output "installer_service_principal_client_id" {

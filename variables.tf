@@ -144,7 +144,7 @@ variable "location" {
 }
 
 #
-# output
+# other variables
 #
 variable "output_as_file" {
   type        = bool
