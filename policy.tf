@@ -15,8 +15,16 @@ resource "azurerm_policy_definition" "deny_vnet" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/virtualNetworks"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/virtualNetworks"
+        },
+        {
+          "field" : "name",
+          "equals" : var.vnet
+        }
+      ]
     },
     "then" : {
       "effect" : "deny"
@@ -34,8 +42,16 @@ resource "azurerm_policy_definition" "deny_vnet_delete" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/virtualNetworks"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/virtualNetworks"
+        },
+        {
+          "field" : "name",
+          "equals" : var.vnet
+        }
+      ]
     },
     "then" : {
       "effect" : "denyAction",
@@ -100,8 +116,16 @@ resource "azurerm_resource_group_policy_assignment" "deny_vnet_assignment" {
 #
 #   policy_rule = jsonencode({
 #     "if" : {
-#       "field" : "type",
-#       "equals" : "Microsoft.Network/virtualNetworks/subnets"
+#       "allOf": [
+#         {
+#           "field" : "type",
+#           "equals" : "Microsoft.Network/virtualNetworks/subnets"
+#         },
+#         {
+#           "field" : "Microsoft.Network/virtualNetworks/name",
+#           "equals" : var.vnet
+#         }
+#       ]
 #     },
 #     "then" : {
 #       "effect" : "deny"
@@ -119,8 +143,16 @@ resource "azurerm_resource_group_policy_assignment" "deny_vnet_assignment" {
 
 #   policy_rule = jsonencode({
 #     "if" : {
-#       "field" : "type",
-#       "equals" : "Microsoft.Network/virtualNetworks/subnets"
+#       "allOf": [
+#         {
+#           "field" : "type",
+#           "equals" : "Microsoft.Network/virtualNetworks/subnets"
+#         },
+#         {
+#           "field" : "Microsoft.Network/virtualNetworks/name",
+#           "equals" : var.vnet
+#         }
+#       ]
 #     },
 #     "then" : {
 #       "effect" : "denyAction",
@@ -179,8 +211,15 @@ resource "azurerm_policy_definition" "deny_route_table" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/routeTables"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/routeTables"
+        },
+        {
+          "anyOf" : [for route_table in var.route_tables : { "field" : "name", "equals" : route_table }]
+        }
+      ]
     },
     "then" : {
       "effect" : "deny"
@@ -198,8 +237,15 @@ resource "azurerm_policy_definition" "deny_route_table_delete" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/routeTables"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/routeTables"
+        },
+        {
+          "anyOf" : [for route_table in var.route_tables : { "field" : "name", "equals" : route_table }]
+        }
+      ]
     },
     "then" : {
       "effect" : "denyAction",
@@ -258,8 +304,15 @@ resource "azurerm_policy_definition" "deny_nat_gateway" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/natGateways"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/natGateways"
+        },
+        {
+          "anyOf" : [for nat_gateway in var.nat_gateways : { "field" : "name", "equals" : nat_gateway }]
+        }
+      ]
     },
     "then" : {
       "effect" : "deny"
@@ -277,8 +330,15 @@ resource "azurerm_policy_definition" "deny_nat_gateway_delete" {
 
   policy_rule = jsonencode({
     "if" : {
-      "field" : "type",
-      "equals" : "Microsoft.Network/natGateways"
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/natGateways"
+        },
+        {
+          "anyOf" : [for nat_gateway in var.nat_gateways : { "field" : "name", "equals" : nat_gateway }]
+        }
+      ]
     },
     "then" : {
       "effect" : "denyAction",
