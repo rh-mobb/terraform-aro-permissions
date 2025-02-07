@@ -1,6 +1,6 @@
 locals {
-  apply_route_table_policy = var.apply_route_table_policy && len(var.route_tables) > 0
-  apply_nat_gateway_policy = var.apply_nat_gateway_policy && len(var.nat_gateways) > 0
+  apply_route_table_policy = var.apply_route_table_policy && length(var.route_tables) > 0
+  apply_nat_gateway_policy = var.apply_nat_gateway_policy && length(var.nat_gateways) > 0
   apply_nsg_policy         = var.apply_nsg_policy && (var.network_security_group != null && var.network_security_group != "")
 }
 
@@ -827,7 +827,7 @@ resource "azurerm_subscription_policy_assignment" "deny_managed_assignment" {
   name                 = "aro-${var.cluster_name}-deny-managed-assignment"
   display_name         = "aro-${var.cluster_name}-deny-managed-assignment"
   policy_definition_id = azurerm_policy_set_definition.deny_managed_initiative[0].id
-  subscription_id      = var.subscription_id
+  subscription_id      = "/subscriptions/${var.subscription_id}"
 
   non_compliance_message {
     content = "Denied via aro-${var.cluster_name}-deny-managed-assignment"
