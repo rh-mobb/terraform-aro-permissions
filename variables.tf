@@ -138,16 +138,22 @@ variable "apply_vnet_policy" {
 #   description = "Apply Azure Policy to further restrict subnet permissions beyond what the role provides."
 # }
 
+variable "apply_route_table_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict route table permissions beyond what the role provides."
+}
+
 variable "apply_nat_gateway_policy" {
   type        = bool
   default     = false
   description = "Apply Azure Policy to further restrict NAT gateway permissions beyond what the role provides."
 }
 
-variable "apply_route_table_policy" {
+variable "apply_nsg_policy" {
   type        = bool
   default     = false
-  description = "Apply Azure Policy to further restrict route table permissions beyond what the role provides."
+  description = "Apply Azure Policy to further restrict NSG permissions beyond what the role provides."
 }
 
 variable "apply_dns_policy" {

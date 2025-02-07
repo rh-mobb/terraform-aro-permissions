@@ -1,3 +1,9 @@
+locals {
+  apply_route_table_policy = var.apply_route_table_policy && len(var.route_tables) > 0
+  apply_nat_gateway_policy = var.apply_nat_gateway_policy && len(var.nat_gateways) > 0
+  apply_nsg_policy         = var.apply_nsg_policy && (var.network_security_group != null && var.network_security_group != "")
+}
+
 #
 # vnet
 #
@@ -202,7 +208,7 @@ locals {
 }
 
 resource "azurerm_policy_definition" "deny_route_table" {
-  count = var.apply_route_table_policy ? 1 : 0
+  count = local.apply_route_table_policy ? 1 : 0
 
   name         = local.deny_route_table_policy_name
   display_name = local.deny_route_table_policy_name
@@ -228,7 +234,7 @@ resource "azurerm_policy_definition" "deny_route_table" {
 }
 
 resource "azurerm_policy_definition" "deny_route_table_delete" {
-  count = var.apply_route_table_policy ? 1 : 0
+  count = local.apply_route_table_policy ? 1 : 0
 
   name         = "${local.deny_route_table_policy_name}-delete"
   display_name = "${local.deny_route_table_policy_name}-delete"
@@ -259,7 +265,7 @@ resource "azurerm_policy_definition" "deny_route_table_delete" {
 }
 
 resource "azurerm_policy_set_definition" "deny_route_table_initiative" {
-  count = var.apply_route_table_policy ? 1 : 0
+  count = local.apply_route_table_policy ? 1 : 0
 
   name         = "${local.deny_route_table_policy_name}-initiative"
   display_name = "${local.deny_route_table_policy_name}-initiative"
@@ -295,7 +301,7 @@ locals {
 }
 
 resource "azurerm_policy_definition" "deny_nat_gateway" {
-  count = var.apply_nat_gateway_policy ? 1 : 0
+  count = local.apply_nat_gateway_policy ? 1 : 0
 
   name         = local.deny_nat_gateway_policy_name
   display_name = local.deny_nat_gateway_policy_name
@@ -321,7 +327,7 @@ resource "azurerm_policy_definition" "deny_nat_gateway" {
 }
 
 resource "azurerm_policy_definition" "deny_nat_gateway_delete" {
-  count = var.apply_nat_gateway_policy ? 1 : 0
+  count = local.apply_nat_gateway_policy ? 1 : 0
 
   name         = "${local.deny_nat_gateway_policy_name}-delete"
   display_name = "${local.deny_nat_gateway_policy_name}-delete"
@@ -352,7 +358,7 @@ resource "azurerm_policy_definition" "deny_nat_gateway_delete" {
 }
 
 resource "azurerm_policy_set_definition" "deny_nat_gateway_initiative" {
-  count = var.apply_nat_gateway_policy ? 1 : 0
+  count = local.apply_nat_gateway_policy ? 1 : 0
 
   name         = "${local.deny_nat_gateway_policy_name}-initiative"
   display_name = "${local.deny_nat_gateway_policy_name}-initiative"
@@ -368,7 +374,7 @@ resource "azurerm_policy_set_definition" "deny_nat_gateway_initiative" {
 }
 
 resource "azurerm_resource_group_policy_assignment" "deny_nat_gateway_assignment" {
-  count = var.apply_nat_gateway_policy ? 1 : 0
+  count = local.apply_nat_gateway_policy ? 1 : 0
 
   name                 = "${local.deny_nat_gateway_policy_name}-assignment"
   display_name         = "${local.deny_nat_gateway_policy_name}-assignment"
@@ -377,6 +383,101 @@ resource "azurerm_resource_group_policy_assignment" "deny_nat_gateway_assignment
 
   non_compliance_message {
     content = "Denied via ${local.deny_nat_gateway_policy_name}-assignment"
+  }
+}
+
+#
+# nsg
+#
+locals {
+  deny_nsg_policy_name = "aro-${var.cluster_name}-deny-nsg"
+}
+
+resource "azurerm_policy_definition" "deny_nsg" {
+  count = local.apply_nsg_policy ? 1 : 0
+
+  name         = local.deny_nsg_policy_name
+  display_name = local.deny_nsg_policy_name
+  policy_type  = "Custom"
+  mode         = "All"
+
+  policy_rule = jsonencode({
+    "if" : {
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/networkSecurityGroups"
+        },
+        {
+          "field" : "name",
+          "equals" : var.network_security_group
+        }
+      ]
+    },
+    "then" : {
+      "effect" : "deny"
+    }
+  })
+}
+
+resource "azurerm_policy_definition" "deny_nsg_delete" {
+  count = local.apply_nsg_policy ? 1 : 0
+
+  name         = "${local.deny_nsg_policy_name}-delete"
+  display_name = "${local.deny_nsg_policy_name}-delete"
+  policy_type  = "Custom"
+  mode         = "All"
+
+  policy_rule = jsonencode({
+    "if" : {
+      "allOf" : [
+        {
+          "field" : "type",
+          "equals" : "Microsoft.Network/natGateways"
+        },
+        {
+          "field" : "name",
+          "equals" : var.network_security_group
+        }
+      ]
+    },
+    "then" : {
+      "effect" : "denyAction",
+      "details" : {
+        "actionNames" : [
+          "delete"
+        ]
+      }
+    }
+  })
+}
+
+resource "azurerm_policy_set_definition" "deny_nsg_initiative" {
+  count = local.apply_nsg_policy ? 1 : 0
+
+  name         = "${local.deny_nsg_policy_name}-initiative"
+  display_name = "${local.deny_nsg_policy_name}-initiative"
+  policy_type  = "Custom"
+
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.deny_nsg[0].id
+  }
+
+  policy_definition_reference {
+    policy_definition_id = azurerm_policy_definition.deny_nsg_delete[0].id
+  }
+}
+
+resource "azurerm_resource_group_policy_assignment" "deny_nsg_assignment" {
+  count = local.apply_nsg_policy ? 1 : 0
+
+  name                 = "${local.deny_nsg_policy_name}-assignment"
+  display_name         = "${local.deny_nsg_policy_name}-assignment"
+  policy_definition_id = azurerm_policy_set_definition.deny_nsg_initiative[0].id
+  resource_group_id    = local.network_resource_group_id
+
+  non_compliance_message {
+    content = "Denied via ${local.deny_nsg_policy_name}-assignment"
   }
 }
 
