@@ -122,8 +122,8 @@ resource "azurerm_resource_group_policy_assignment" "deny_vnet_assignment" {
 #           "equals" : "Microsoft.Network/virtualNetworks/subnets"
 #         },
 #         {
-#           "field" : "Microsoft.Network/virtualNetworks/name",
-#           "equals" : var.vnet
+#           "field" : "id",
+#           "contains" : "${local.network_resource_group_id}/providers/Microsoft.Network/virtualNetworks/${var.vnet}"
 #         }
 #       ]
 #     },
@@ -149,8 +149,8 @@ resource "azurerm_resource_group_policy_assignment" "deny_vnet_assignment" {
 #           "equals" : "Microsoft.Network/virtualNetworks/subnets"
 #         },
 #         {
-#           "field" : "Microsoft.Network/virtualNetworks/name",
-#           "equals" : var.vnet
+#           "field" : "id",
+#           "contains" : "${local.network_resource_group_id}/providers/Microsoft.Network/virtualNetworks/${var.vnet}"
 #         }
 #       ]
 #     },
