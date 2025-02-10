@@ -70,6 +70,12 @@ variable "vnet_resource_group" {
   description = "Resource Group where the VNET resides.  If unspecified, defaults to 'aro_resource_group.name'."
 }
 
+variable "managed_resource_group" {
+  type        = string
+  default     = null
+  description = "Resource Group where the ARO object (managed resource group) resides."
+}
+
 # TODO: pull from data sources
 variable "route_tables" {
   type        = list(string)
@@ -109,6 +115,63 @@ variable "minimal_aro_role" {
   type        = string
   default     = null
   description = "Role to manage to substitute for full 'Contributor' on the ARO resource group.  If specified, this is created, otherwise 'Contributor' is used.  For objects such as disk encryption sets, this is used as a prefix for the role."
+}
+
+#
+# policy
+#
+variable "apply_vnet_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict VNET permissions beyond what the role provides."
+}
+
+# TODO: uncomment this only when PR https://github.com/Azure/ARO-RP/pull/4087 is
+#       merged and released.  Currently, the subnet/write permission is still 
+#       needed as the resource provider does a CreateOrUpdate regardless of
+#       correct subnet configuration, which needs subnet/write.  Once the above
+#       PR is merged and active, we can uncomment the below.
+#
+# variable "apply_subnet_policy" {
+#   type        = bool
+#   default     = false
+#   description = "Apply Azure Policy to further restrict subnet permissions beyond what the role provides."
+# }
+
+variable "apply_route_table_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict route table permissions beyond what the role provides."
+}
+
+variable "apply_nat_gateway_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict NAT gateway permissions beyond what the role provides."
+}
+
+variable "apply_nsg_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict NSG permissions beyond what the role provides."
+}
+
+variable "apply_dns_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict DNS permissions beyond what the role provides.  Must also specify 'var.managed_resource_group' to apply."
+}
+
+variable "apply_private_dns_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict DNS permissions beyond what the role provides.  Must also specify 'var.managed_resource_group' to apply."
+}
+
+variable "apply_public_ip_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict Public IP permissions beyond what the role provides.  Must also specify 'var.managed_resource_group' to apply."
 }
 
 #

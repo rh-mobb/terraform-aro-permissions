@@ -35,8 +35,8 @@ This section defines the objects which need individual permissions.
 | ---- | ---- | ---- |
 | Subscription | `--subscription` | The highest level a permission will be applied.  Inherits down to all objects within that subscription.  This is not a mandatory flag and the subscription may be set based on how a user has logged in with `az login`. |
 | ARO Resource Group | `--resource-group` | Resource group in the above subscription where the actual ARO object is created. |
-| Cluster Resource Group | `--cluster-resource-group` | Resource group in the above subscription where the underlying ARO objects (e.g. VMs, load balancers) are created.  This is created automatically as part of provisioning. |
-| Network Resource Group | `--vnet-resource-group` | Resource group in the above subscription where network resources (e.g. VNET, NSG) exist.  Some organizations will use the Cluster Resource Group for this purpose as well and do not need a dedicated Network Resource Group. |
+| Managed Resource Group | `--cluster-resource-group` | Resource group in the above subscription where the underlying ARO objects (e.g. VMs, load balancers) are created.  This is created automatically as part of provisioning and is managed by the ARO service itself. |
+| Network Resource Group | `--vnet-resource-group` | Resource group in the above subscription where network resources (e.g. VNET, NSG) exist.  Some organizations will use the Managed Resource Group for this purpose as well and do not need a dedicated Network Resource Group. |
 | VNET | `--vnet`| VNET where the ARO cluster will be provisioned. |
 | Network Security Group | N/A | Only required for BYO-NSG scenarios.  Network security group, applied to the subnets.  This is is pre-applied by the user to the subnets prior to installation. |
 | Disk Encryption Set | `--disk-encryption-set` | The disk encryption set used to encrypt master and worker node disks. |
@@ -62,7 +62,7 @@ This section identifies what permissions are needed by each individual identity.
 | 10 | [Resource Provider Service Principal](#identities) | [VNET](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
 | 11 | [Resource Provider Service Principal](#identities) | [Network Security Group](#objects) | [Network Contributor](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#network-contributor) or [Minimal Network Permissions](#minimal-network-permissions) | |
 | 12 | [Resource Provider Service Principal](#identities) | [Disk Encryption Set](#objects) | [Other](#other-permissions) | |
-| 13 | [Resource Provider Service Principal](#identities) | [Cluster Resource Group](#objects) | [Owner](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#owner) | This permission does not need to pre-exist.  It is applied when the Resource Provider Service Principal creates the resource group as part of installation.  This is for documentation purposes only. |
+| 13 | [Resource Provider Service Principal](#identities) | [Managed Resource Group](#objects) | [Owner](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#owner) | This permission does not need to pre-exist.  It is applied when the Resource Provider Service Principal creates the resource group as part of installation.  This is for documentation purposes only. |
 
 
 ### Minimal Network Permissions
@@ -114,6 +114,33 @@ In addition to minimizing network permissions, the installer role may need minim
 In addition to the above, the following other permissions may be needed by specific identities:
 
 * [Microsoft.Compute/diskEncryptionSets/read](https://github.com/Azure/ARO-RP/blob/v20240503.00/pkg/validate/dynamic/diskencryptionset.go#L78)
+
+
+### Azure Policy
+
+Users may wish to further restrict required minimal permissions above with Azure Policy.  Below are the 
+list of permissions that may be limited and any known limitations when doing so.  See the [apply_*_policy](variables.tf) variables to see what is known to be able to be further limited.
+
+| Permissions                                               | Known Limitations                                               |
+| --------------------------------------------------------- | --------------------------------------------------------------- |
+| Microsoft.Network/virtualNetworks/join/action             | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/write                   | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/subnets/join/action     | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/subnets/write           | - `subnets/write` still need [this](https://github.com/Azure/ARO-RP/pull/4087) merged and deployed before we can limit it  <br>
+|                                                           | - [No ability to dynamically create private link endpoint](https://github.com/kubernetes-sigs/azurefile-csi-driver/blob/master/docs/driver-parameters.md) with File Services operator with `networkEndpointType` parameter  <br> 
+|                                                           | - No ability to ensure NSG to subnet attachment (likely not applicable in BYO-NSG scenarios).  <br>
+|                                                           | - Must have `Microsoft.ContainerRegistry` and `Microsoft.Storage` service endpoints set on the subnet.  <br> 
+|                                                           | - Must have network policy for private endpoints set to `Disabled`. |
+| Microsoft.Network/routeTables/join/action                 | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/routeTables/write                       | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/natGateways/join/action                 | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/natGateways/write                       | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/publicIPAddresses/write                 | - Must have `private` for both Ingress and API profiles.            |
+| Microsoft.Network/publicIPAddresses/delete                | - Must have `private` for both Ingress and API profiles.            |
+| Microsoft.Network/dnsZones/A/write                        | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/dnsZones/A/delete                       | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/privateDnsZones/A/write                 | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/privateDnsZones/A/delete                | - Must have `domain` defined (BYO-domain).                          |
 
 
 ## Prereqs
