@@ -116,6 +116,33 @@ In addition to the above, the following other permissions may be needed by speci
 * [Microsoft.Compute/diskEncryptionSets/read](https://github.com/Azure/ARO-RP/blob/v20240503.00/pkg/validate/dynamic/diskencryptionset.go#L78)
 
 
+### Azure Policy
+
+Users may wish to further restrict required minimal permissions above with Azure Policy.  Below are the 
+list of permissions that may be limited and any known limitations when doing so.  See the [apply_*_policy](variables.tf) variables to see what is known to be able to be further limited.
+
+| Permissions                                               | Known Limitations                                               |
+| --------------------------------------------------------- | --------------------------------------------------------------- |
+| Microsoft.Network/virtualNetworks/join/action             | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/write                   | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/subnets/join/action     | - Must have `outbound_type` == `UserDefinedRouting`.            |
+| Microsoft.Network/virtualNetworks/subnets/write           | - `subnets/write` still need [this](https://github.com/Azure/ARO-RP/pull/4087) merged and deployed before we can limit it  <br>
+|                                                           | - [No ability to dynamically create private link endpoint](https://github.com/kubernetes-sigs/azurefile-csi-driver/blob/master/docs/driver-parameters.md) with File Services operator with `networkEndpointType` parameter  <br> 
+|                                                           | - No ability to ensure NSG to subnet attachment (likely not applicable in BYO-NSG scenarios).  <br>
+|                                                           | - Must have `Microsoft.ContainerRegistry` and `Microsoft.Storage` service endpoints set on the subnet.  <br> 
+|                                                           | - Must have network policy for private endpoints set to `Disabled`. |
+| Microsoft.Network/routeTables/join/action                 | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/routeTables/write                       | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/natGateways/join/action                 | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/natGateways/write                       | - Must have `outbound_type` == `UserDefinedRouting`.                |
+| Microsoft.Network/publicIPAddresses/write                 | - Must have `private` for both Ingress and API profiles.            |
+| Microsoft.Network/publicIPAddresses/delete                | - Must have `private` for both Ingress and API profiles.            |
+| Microsoft.Network/dnsZones/A/write                        | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/dnsZones/A/delete                       | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/privateDnsZones/A/write                 | - Must have `domain` defined (BYO-domain).                          |
+| Microsoft.Network/privateDnsZones/A/delete                | - Must have `domain` defined (BYO-domain).                          |
+
+
 ## Prereqs
 
 Prior to running this module, the following must be satisfied:
