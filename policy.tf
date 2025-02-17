@@ -802,18 +802,18 @@ resource "azurerm_policy_set_definition" "deny_managed_initiative" {
   policy_type  = "Custom"
 
   dynamic "policy_definition_reference" {
-    for_each = {
+    for_each = compact([
       # objects strictly in the managed resource group
-      deny_dns                     = local.apply_dns_policy ? azurerm_policy_definition.deny_dns[0].id : null
-      deny_dns_delete              = local.apply_dns_policy ? azurerm_policy_definition.deny_dns_delete[0].id : null
-      deny_dns_zone                = local.apply_dns_policy ? azurerm_policy_definition.deny_dns_zone[0].id : null
-      deny_dns_zone_delete         = local.apply_dns_policy ? azurerm_policy_definition.deny_dns_zone_delete[0].id : null
-      deny_private_dns             = local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns[0].id : null
-      deny_private_dns_delete      = local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_delete[0].id : null
-      deny_private_dns_zone        = local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_zone[0].id : null
-      deny_private_dns_zone_delete = local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_zone_delete[0].id : null
-      deny_public_ip               = local.apply_public_ip_policy ? azurerm_policy_definition.deny_public_ip[0].id : null
-      deny_public_ip_delete        = local.apply_public_ip_policy ? azurerm_policy_definition.deny_public_ip_delete[0].id : null
+      local.apply_dns_policy ? azurerm_policy_definition.deny_dns[0].id : null,
+      local.apply_dns_policy ? azurerm_policy_definition.deny_dns_delete[0].id : null,
+      local.apply_dns_policy ? azurerm_policy_definition.deny_dns_zone[0].id : null,
+      local.apply_dns_policy ? azurerm_policy_definition.deny_dns_zone_delete[0].id : null,
+      local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns[0].id : null,
+      local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_delete[0].id : null,
+      local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_zone[0].id : null,
+      local.apply_private_dns_policy ? azurerm_policy_definition.deny_private_dns_zone_delete[0].id : null,
+      local.apply_public_ip_policy ? azurerm_policy_definition.deny_public_ip[0].id : null,
+      local.apply_public_ip_policy ? azurerm_policy_definition.deny_public_ip_delete[0].id : null,
 
       # also limit other network-related permissions as they are not needed within the managed resource group, e.g.
       # VNET object exist in the VNET resource group so we should restrict permissions here as well
@@ -827,15 +827,15 @@ resource "azurerm_policy_set_definition" "deny_managed_initiative" {
       #       correct subnet configuration, which needs subnet/write.  Once the above
       #       PR is merged and active, we can uncomment the below.
       #
-      # deny_subnet           = var.apply_subnet_policy ? azurerm_policy_definition.deny_subnet[0].id : null
-      # deny_subnet_delete    = var.apply_subnet_policy ? azurerm_policy_definition.deny_subnet_delete[0].id : null
-      deny_vnet               = var.apply_vnet_policy ? azurerm_policy_definition.deny_vnet[0].id : null
-      deny_vnet_delete        = var.apply_vnet_policy ? azurerm_policy_definition.deny_vnet_delete[0].id : null
-      deny_route_table        = local.apply_route_table_policy ? azurerm_policy_definition.deny_route_table[0].id : null
-      deny_route_table_delete = local.apply_route_table_policy ? azurerm_policy_definition.deny_route_table_delete[0].id : null
-      deny_nat_gateway        = local.apply_nat_gateway_policy ? azurerm_policy_definition.deny_nat_gateway[0].id : null
-      deny_nat_gateway_delete = local.apply_nat_gateway_policy ? azurerm_policy_definition.deny_nat_gateway_delete[0].id : null
-    }
+      # var.apply_subnet_policy ? azurerm_policy_definition.deny_subnet[0].id : null
+      # var.apply_subnet_policy ? azurerm_policy_definition.deny_subnet_delete[0].id : null
+      var.apply_vnet_policy ? azurerm_policy_definition.deny_vnet[0].id : null,
+      var.apply_vnet_policy ? azurerm_policy_definition.deny_vnet_delete[0].id : null,
+      local.apply_route_table_policy ? azurerm_policy_definition.deny_route_table[0].id : null,
+      local.apply_route_table_policy ? azurerm_policy_definition.deny_route_table_delete[0].id : null,
+      local.apply_nat_gateway_policy ? azurerm_policy_definition.deny_nat_gateway[0].id : null,
+      local.apply_nat_gateway_policy ? azurerm_policy_definition.deny_nat_gateway_delete[0].id : null
+    ])
 
     content {
       policy_definition_id = policy_definition_reference.value
