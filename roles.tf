@@ -41,9 +41,9 @@ locals {
   # because managed identity performs a union of static permissions to the built-in role
   # permissions and the built-in role permissions do not have write permissions for certain 
   # objects, which allows us to skip this for managed identity clusters.
-  vnet_permissions        = var.enable_managed_identities ? local.vnet_permissions_base : concat(local.vnet_permissions_base, "Microsoft.Network/virtualNetworks/write")
-  route_table_permissions = var.enable_managed_identities ? local.route_table_permissions_base : concat(local.route_table_permissions_base, "Microsoft.Network/routeTables/write")
-  nat_gateway_permissions = var.enable_managed_identities ? local.nat_gateway_permissions_base : concat(local.nat_gateway_permissions_base, "Microsoft.Network/natGateways/write")
+  vnet_permissions        = var.enable_managed_identities ? local.vnet_permissions_base : concat(local.vnet_permissions_base, ["Microsoft.Network/virtualNetworks/write"])
+  route_table_permissions = var.enable_managed_identities ? local.route_table_permissions_base : concat(local.route_table_permissions_base, ["Microsoft.Network/routeTables/write"])
+  nat_gateway_permissions = var.enable_managed_identities ? local.nat_gateway_permissions_base : concat(local.nat_gateway_permissions_base, ["Microsoft.Network/natGateways/write"])
 }
 
 # vnet
