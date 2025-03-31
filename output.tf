@@ -2,7 +2,7 @@
 # output created service principals and credentials to a file
 #
 resource "local_sensitive_file" "cluster_service_principal" {
-  count = var.cluster_service_principal.create && var.output_as_file ? 1 : 0
+  count = local.cluster_service_principal_create && var.output_as_file ? 1 : 0
 
   content         = <<-EOT
 ARO_CLUSTER_SP_CLIENT_ID='${azuread_application.cluster[0].client_id}'
@@ -13,7 +13,7 @@ EOT
 }
 
 resource "local_sensitive_file" "installer_service_principal" {
-  count = local.installer_user_set ? 0 : ((var.installer_service_principal.create && var.output_as_file) ? 1 : 0)
+  count = local.installer_user_set ? 0 : ((local.installer_service_principal_create && var.output_as_file) ? 1 : 0)
 
   content         = <<-EOT
 ARO_INSTALLER_SP_CLIENT_ID='${azuread_application.installer[0].client_id}'
