@@ -42,10 +42,30 @@ variable "installer_service_principal" {
   description = "Installer Service Principal to use or optionally create.  If name is unset, the cluster_name is used to derive a name.  Overridden if an 'installer_user_name' is specified."
 }
 
+variable "resource_provider_service_principal_name" {
+  type        = string
+  default     = "Azure Red Hat OpenShift RP"
+  description = "ARO Resource Provider Service Principal name.  This will not change unless you are testing development use cases."
+}
+
 variable "installer_user" {
   type        = string
   default     = ""
   description = "User who will be executing the installation (e.g. via az aro create).  This overrides the 'installer_service_principal'.  Must be in UPN format (e.g. jdoe@example.com)."
+}
+
+#
+# managed identities
+#
+variable "enable_managed_identities" {
+  type        = bool
+  default     = false
+  description = "Enable use of managed identities.  If 'true', overrides the '*_service_principal' settings.  Managed identities are placed in the 'aro_resource_group'."
+
+  validation {
+    condition     = var.enable_managed_identities == false
+    error_message = "The 'enable_managed_identities' feature is not yet available.  Please set to 'false'."
+  }
 }
 
 #
@@ -76,14 +96,17 @@ variable "managed_resource_group" {
   description = "Resource Group where the ARO object (managed resource group) resides."
 }
 
-# TODO: pull from data sources
+variable "subnets" {
+  type        = list(string)
+  description = "Names of subnets used that belong to the 'vnet' variable.  Must be a child of the 'vnet'."
+}
+
 variable "route_tables" {
   type        = list(string)
   default     = []
   description = "Names of route tables for user-defined routing.  Route tables are assumed to exist in 'vnet_resource_group'."
 }
 
-# TODO: pull from data sources
 variable "nat_gateways" {
   type        = list(string)
   default     = []
@@ -120,23 +143,23 @@ variable "minimal_aro_role" {
 #
 # policy
 #
+variable "apply_network_policies_to_all" {
+  type        = bool
+  default     = false
+  description = "Apply policies irrespective of object name.  This is helpful when you want to ensure all permissions are denied, irrespective of individual objects.  This is normal in scenarios where network objects are not grouped together (e.g. one VNET in a resource group) and there is no risk for denying something that may cause issues."
+}
+
 variable "apply_vnet_policy" {
   type        = bool
   default     = false
   description = "Apply Azure Policy to further restrict VNET permissions beyond what the role provides."
 }
 
-# TODO: uncomment this only when PR https://github.com/Azure/ARO-RP/pull/4087 is
-#       merged and released.  Currently, the subnet/write permission is still 
-#       needed as the resource provider does a CreateOrUpdate regardless of
-#       correct subnet configuration, which needs subnet/write.  Once the above
-#       PR is merged and active, we can uncomment the below.
-#
-# variable "apply_subnet_policy" {
-#   type        = bool
-#   default     = false
-#   description = "Apply Azure Policy to further restrict subnet permissions beyond what the role provides."
-# }
+variable "apply_subnet_policy" {
+  type        = bool
+  default     = false
+  description = "Apply Azure Policy to further restrict subnet permissions beyond what the role provides."
+}
 
 variable "apply_route_table_policy" {
   type        = bool
@@ -190,13 +213,11 @@ variable "environment" {
 
 variable "subscription_id" {
   type        = string
-  default     = null
   description = "Explicitly use a specific Azure subscription id (defaults to the current system configuration)."
 }
 
 variable "tenant_id" {
   type        = string
-  default     = null
   description = "Explicitly use a specific Azure tenant id (defaults to the current system configuration)."
 }
 

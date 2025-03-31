@@ -4,34 +4,46 @@
 locals {
   has_custom_network_role = (var.minimal_network_role != null && var.minimal_network_role != "")
 
-  # permissions needed on vnets
-  vnet_permissions = [
+  # base permissions needed on vnets
+  vnet_permissions_base = [
     "Microsoft.Network/virtualNetworks/join/action",
-    "Microsoft.Network/virtualNetworks/read",
-    "Microsoft.Network/virtualNetworks/write",
+    "Microsoft.Network/virtualNetworks/read"
+  ]
+
+  # base permissions needed on subnets
+  # NOTE: once write permissions are removed from subnets, we can create this as a base local
+  #       like we do with vnet/route tables/nat gateways and apply them to subnets much
+  #       like we do on lines 45-47.
+  subnet_permissions = [
     "Microsoft.Network/virtualNetworks/subnets/join/action",
     "Microsoft.Network/virtualNetworks/subnets/read",
     "Microsoft.Network/virtualNetworks/subnets/write"
   ]
 
-  # permissions needed by vnets with route tables
-  route_table_permissions = [
+  # base permissions needed by vnets with route tables
+  route_table_permissions_base = [
     "Microsoft.Network/routeTables/join/action",
-    "Microsoft.Network/routeTables/read",
-    "Microsoft.Network/routeTables/write"
+    "Microsoft.Network/routeTables/read"
   ]
 
-  # permissions needed by vnets with nat gateways
-  nat_gateway_permissions = [
+  # base permissions needed by vnets with nat gateways
+  nat_gateway_permissions_base = [
     "Microsoft.Network/natGateways/join/action",
-    "Microsoft.Network/natGateways/read",
-    "Microsoft.Network/natGateways/write"
+    "Microsoft.Network/natGateways/read"
   ]
 
-  # permissions needed by vnets which use a custom network security group
+  # base permissions needed by vnets which use a custom network security group
   network_security_group_permissions = [
     "Microsoft.Network/networkSecurityGroups/join/action"
   ]
+
+  # add write-level permissions only if enable_managed_identity is not requested.  this is 
+  # because managed identity performs a union of static permissions to the built-in role
+  # permissions and the built-in role permissions do not have write permissions for certain 
+  # objects, which allows us to skip this for managed identity clusters.
+  vnet_permissions        = var.enable_managed_identities ? local.vnet_permissions_base : concat(local.vnet_permissions_base, "Microsoft.Network/virtualNetworks/write")
+  route_table_permissions = var.enable_managed_identities ? local.route_table_permissions_base : concat(local.route_table_permissions_base, "Microsoft.Network/routeTables/write")
+  nat_gateway_permissions = var.enable_managed_identities ? local.nat_gateway_permissions_base : concat(local.nat_gateway_permissions_base, "Microsoft.Network/natGateways/write")
 }
 
 # vnet
@@ -45,6 +57,21 @@ resource "azurerm_role_definition" "network" {
 
   permissions {
     actions = local.vnet_permissions
+  }
+}
+
+# subnet
+# TODO: this eventually needs to change scopes to subnets
+resource "azurerm_role_definition" "subnet" {
+  count = local.has_custom_network_role ? 1 : 0
+
+  name              = "${var.minimal_network_role}-subnet"
+  description       = "Custom role for ARO network subnets for cluster: ${var.cluster_name}"
+  scope             = local.vnet_id
+  assignable_scopes = [local.vnet_id]
+
+  permissions {
+    actions = local.subnet_permissions
   }
 }
 
