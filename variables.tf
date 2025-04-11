@@ -61,11 +61,6 @@ variable "enable_managed_identities" {
   type        = bool
   default     = false
   description = "Enable use of managed identities.  If 'true', overrides the '*_service_principal' settings.  Managed identities are placed in the 'aro_resource_group'."
-
-  validation {
-    condition     = var.enable_managed_identities == false
-    error_message = "The 'enable_managed_identities' feature is not yet available.  Please set to 'false'."
-  }
 }
 
 #
