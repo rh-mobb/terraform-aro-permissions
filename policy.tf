@@ -118,7 +118,7 @@ locals {
       },
       {
         "field" : "id",
-        "contains" : "${local.network_resource_group_id}/providers/Microsoft.Network/virtualNetworks/${var.vnet}"
+        "contains" : "${local.vnet_id}"
       }
     ]
   }

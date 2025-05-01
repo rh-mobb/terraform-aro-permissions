@@ -1,20 +1,28 @@
 #
+# helpers
+#
+locals {
+  network_api_path_prefix = "${local.network_resource_group_id}/providers/Microsoft.Network"
+
+  has_network_security_group = var.network_security_group != null && var.network_security_group != ""
+  has_route_tables           = var.route_tables != null && length(var.route_tables) > 0
+  has_nat_gateways           = var.nat_gateways != null && length(var.nat_gateways) > 0
+  has_disk_encryption_set    = var.disk_encryption_set != null && var.disk_encryption_set != ""
+}
+
+#
 # object ids
 #
 locals {
   # network object ids
-  vnet_id                   = "${local.network_resource_group_id}/providers/Microsoft.Network/virtualNetworks/${var.vnet}"
+  vnet_id                   = "${local.network_api_path_prefix}/virtualNetworks/${var.vnet}"
   subnet_ids                = [for s in var.subnets : "${local.vnet_id}/subnets/${s}"]
-  network_security_group_id = (var.network_security_group == null || var.network_security_group == "") ? null : "${local.network_resource_group_id}/providers/Microsoft.Network/networkSecurityGroups/${var.network_security_group}"
-  route_table_ids = length(var.route_tables) == 0 || var.route_tables == null ? [] : [
-    for route_table in var.route_tables : "${local.network_resource_group_id}/providers/Microsoft.Network/routeTables/${route_table}"
-  ]
-  nat_gateway_ids = length(var.nat_gateways) == 0 || var.nat_gateways == null ? [] : [
-    for nat_gateway in var.nat_gateways : "${local.network_resource_group_id}/providers/Microsoft.Network/natGateways/${nat_gateway}"
-  ]
+  network_security_group_id = local.has_network_security_group ? "${local.network_api_path_prefix}/networkSecurityGroups/${var.network_security_group}" : null
+  route_table_ids           = local.has_route_tables ? [for route_table in var.route_tables : "${local.network_api_path_prefix}/routeTables/${route_table}"] : []
+  nat_gateway_ids           = local.has_nat_gateways ? [for nat_gateway in var.nat_gateways : "${local.network_api_path_prefix}/natGateways/${nat_gateway}"] : []
 
   # other object ids
-  disk_encryption_set_id = (var.disk_encryption_set == null || var.disk_encryption_set == "") ? null : "${local.aro_resource_group_id}/providers/Microsoft.Compute/diskEncryptionSets/${var.disk_encryption_set}"
+  disk_encryption_set_id = local.has_disk_encryption_set ? "${local.aro_resource_group_id}/providers/Microsoft.Compute/diskEncryptionSets/${var.disk_encryption_set}" : null
 }
 
 #
@@ -128,7 +136,7 @@ resource "azurerm_role_assignment" "cluster_nat_gateways" {
 
 # permission 2: assign cluster identity with appropriate network security group permissions
 resource "azurerm_role_assignment" "cluster_network_security_group" {
-  count = (var.network_security_group != null && var.network_security_group != "") ? length(local.network_security_group_cluster_identities) : 0
+  count = local.has_network_security_group ? length(local.network_security_group_cluster_identities) : 0
 
   scope                            = local.network_security_group_id
   role_definition_id               = local.has_custom_network_role ? azurerm_role_definition.network_network_security_group[0].role_definition_resource_id : null
@@ -257,7 +265,7 @@ resource "azurerm_role_assignment" "resource_provider_nat_gateways" {
 
 # permission 11: assign resource provider service principal with appropriate network security group permissions
 resource "azurerm_role_assignment" "resource_provider_network_security_group" {
-  count = (var.network_security_group == null || var.network_security_group == "") ? 0 : 1
+  count = local.has_network_security_group ? 1 : 0
 
   scope                = local.network_security_group_id
   role_definition_id   = local.has_custom_network_role ? azurerm_role_definition.network_network_security_group[0].role_definition_resource_id : null
